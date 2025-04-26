@@ -1,15 +1,15 @@
-import { Routes, Route } from "react-router-dom";
-import Home from "../pages/Home";
-import Login from "../pages/Login";
-import Register from "../pages/User/register.user";
+import Login from "../pages/User/Login";
+import Register from "../pages/User/Register";
 import Dashboard from "../pages/Dashboard";
 import AdminPanel from "../pages/Admin/Panel";
 import Users from "../pages/Admin/Users";
-import NotFound from "../pages/NotFound";
 import PublicLayout from "../layouts/PublicLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import { useRoutes } from "react-router-dom";
+import Home from "../pages/Home/Index";
+import NotFound from "../pages/NotFound/Index";
+import Products from "../pages/Products";
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -20,6 +20,7 @@ const AppRoutes = () => {
         { path: "", element: <Home /> },
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
+        { path: "products", element: <Products /> },
       ],
     },
     {
@@ -44,11 +45,7 @@ const AppRoutes = () => {
     },
     {
       path: "*",
-      element: (
-        <h1>
-          <NotFound />
-        </h1>
-      ),
+      element: <NotFound />,
     },
   ]);
 

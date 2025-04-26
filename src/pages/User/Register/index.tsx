@@ -1,15 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { RootState } from "../../store";
-import { registerUser } from "../../features/users/userThunks";
-import { getProducts } from "../../features/products/productThunks";
 import "./Register.scss";
+import { registerUser } from "../../../redux/Slices/users/userThunks";
+import { getProducts } from "../../../redux/Slices/products/productThunks";
+import { RootState } from "../../../redux/store";
+import { Link } from "react-router-dom";
 
 const Register = () => {
-  const dispatch = useDispatch<typeof import("../../store").store.dispatch>();
-  const { loading, error, success } = useSelector((state: RootState) => {
+  const dispatch =
+    useDispatch<typeof import("../../../redux/store").store.dispatch>();
+  const { user, loading, error, success } = useSelector((state: RootState) => {
     return state.users as {
+      user: { id: string; name: string; email: string } | null;
       loading: boolean;
       error: string | null;
       success: boolean;
@@ -50,18 +53,58 @@ const Register = () => {
     console.log("getProducts dispatched");
   };
 
+  useEffect(() => {
+    if (user && user.id) {
+      console.log("User registered successfully:", user);
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+      });
+    }
+  }, [user]);
+
   return (
     <div className="register-container">
+      <h1>Register</h1>
       <form className="register-form" onSubmit={handleSubmit}>
-        <input name="name" onChange={handleChange} placeholder="Name" />
-        <input name="email" onChange={handleChange} placeholder="Email" />
+        <label htmlFor="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          onChange={handleChange}
+          placeholder="Enter your name"
+          required
+        />
+
+        <label htmlFor="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          onChange={handleChange}
+          placeholder="Enter your email"
+          required
+        />
+
+        <label htmlFor="password">Password</label>
         <input
           type="password"
+          id="password"
           name="password"
           onChange={handleChange}
-          placeholder="Password"
+          placeholder="Enter your password"
+          required
         />
-        <input type="file" accept="image/*" onChange={handleFileChange} />
+
+        <label htmlFor="profileImage">Profile Image</label>
+        <input
+          type="file"
+          id="profileImage"
+          accept="image/*"
+          onChange={handleFileChange}
+        />
 
         <button type="submit" disabled={loading}>
           {loading ? "Registering..." : "Register"}
@@ -70,10 +113,9 @@ const Register = () => {
         {success && <p className="message">Registration successful!</p>}
         {error && <p className="error">Error: {error}</p>}
       </form>
-
-      {/* <button className="get-products-btn" onClick={handleGetProducts}>
-        getProducts
-      </button> */}
+      <Link to="/login" className="link">
+        Back to Login
+      </Link>
     </div>
   );
 };
