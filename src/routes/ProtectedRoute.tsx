@@ -1,16 +1,17 @@
-// import { JSX } from "react";
-// import { Navigate } from "react-router-dom";
-
-// const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
-//   const isAuthenticated = !!localStorage.getItem("token");
-//   return isAuthenticated ? children : <Navigate to="/login" />;
-// };
-
-// export default ProtectedRoute;
-
-// routes/ProtectedRoute.tsx
 import { JSX } from "react";
 import { Navigate } from "react-router-dom";
+import Cookies from "js-cookie";
+
+// Helper function to decode JWT token
+const decodeToken = (token: string) => {
+  try {
+    const payload = token.split(".")[1];
+    return JSON.parse(atob(payload));
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return null;
+  }
+};
 
 const ProtectedRoute = ({
   children,
@@ -19,11 +20,18 @@ const ProtectedRoute = ({
   children: JSX.Element;
   roles?: string[];
 }) => {
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const token = Cookies.get("token");
 
+  // If the token exists, decode it
+  const user = token ? decodeToken(token) : null;
+  console.log("user:", user);
+
+  // If there's no valid user or token, redirect to login page
   if (!user) return <Navigate to="/login" />;
+
+  // Optionally check if the user has the required role
   if (roles.length && !roles.includes(user.role)) {
-    return <Navigate to="/" />;
+    return <Navigate to="/unauthorized" />;
   }
 
   return children;

@@ -5,7 +5,8 @@ import "./Register.scss";
 import { registerUser } from "../../../redux/Slices/users/userThunks";
 import { getProducts } from "../../../redux/Slices/products/productThunks";
 import { RootState } from "../../../redux/store";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const dispatch =
@@ -18,6 +19,7 @@ const Register = () => {
       success: boolean;
     };
   });
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -45,13 +47,22 @@ const Register = () => {
     form.append("password", formData.password);
     if (image) form.append("file", image);
 
-    dispatch(registerUser(form));
+    dispatch(registerUser(form)).then((res) => {
+      if (res.meta.requestStatus === "fulfilled") {
+        console.log("User registered successfully:", res.payload);
+        navigate("/login");
+        // handleGetProducts();
+      } else {
+        console.error("Registration failed:", res);
+        toast.error("Registration failed. Please try again.");
+      }
+    });
   };
 
-  const handleGetProducts = () => {
-    dispatch(getProducts());
-    console.log("getProducts dispatched");
-  };
+  // const handleGetProducts = () => {
+  //   dispatch(getProducts());
+  //   console.log("getProducts dispatched");
+  // };
 
   useEffect(() => {
     if (user && user.id) {

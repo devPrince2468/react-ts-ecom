@@ -1,25 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addProduct, getProducts, updateProduct } from "./productThunks";
+import { addCartItem, getCartItems, updateCartItem } from "./cartThunks";
 
-interface ProductState {
-  products: any | null;
+interface CartState {
+  items: any | null;
   loading: boolean;
   error: string | null;
   success: boolean;
 }
 
-const initialState: ProductState = {
-  products: null,
+const initialState: CartState = {
+  items: null,
   loading: false,
   error: null,
   success: false,
 };
 
-const productSlice = createSlice({
-  name: "products",
+const cartSlice = createSlice({
+  name: "cart",
   initialState,
   reducers: {
-    resetProductState: (state) => {
+    resetCartState: (state) => {
       state.loading = false;
       state.error = null;
       state.success = false;
@@ -27,51 +27,51 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getProducts.pending, (state) => {
+      .addCase(getCartItems.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
       })
-      .addCase(getProducts.fulfilled, (state, action) => {
+      .addCase(getCartItems.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload;
+        state.items = action.payload;
         state.success = true;
       })
-      .addCase(getProducts.rejected, (state, action) => {
+      .addCase(getCartItems.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string | null;
         state.success = false;
       })
 
       // add product
-      .addCase(addProduct.pending, (state) => {
+      .addCase(addCartItem.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
       })
-      .addCase(addProduct.fulfilled, (state, action) => {
+      .addCase(addCartItem.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload as string | null;
+        state.items = action.payload as string | null;
         state.success = true;
       })
-      .addCase(addProduct.rejected, (state, action) => {
+      .addCase(addCartItem.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string | null;
         state.success = false;
       })
 
       // update product
-      .addCase(updateProduct.pending, (state) => {
+      .addCase(updateCartItem.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
       })
-      .addCase(updateProduct.fulfilled, (state, action) => {
+      .addCase(updateCartItem.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload as string | null;
+        state.items = action.payload as string | null;
         state.success = true;
       })
-      .addCase(updateProduct.rejected, (state, action) => {
+      .addCase(updateCartItem.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string | null;
         state.success = false;
@@ -79,5 +79,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { resetProductState } = productSlice.actions;
-export default productSlice.reducer;
+export const { resetCartState } = cartSlice.actions;
+export default cartSlice.reducer;

@@ -1,11 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "../../../utility/axios";
 
-export const getProducts = createAsyncThunk(
-  "product/getProducts",
+export const getCartItems = createAsyncThunk(
+  "cart/getCartItems",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await instance.get("/product");
+      const response = await instance.get("/cart");
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
@@ -15,13 +15,11 @@ export const getProducts = createAsyncThunk(
   }
 );
 
-export const addProduct = createAsyncThunk(
-  "product/addProduct",
-  async (formData: FormData, { rejectWithValue }) => {
+export const addCartItem = createAsyncThunk(
+  "cart/addCartItem",
+  async (data: any, { rejectWithValue }) => {
     try {
-      const response = await instance.post("/product", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await instance.post("/cart", data);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
@@ -31,14 +29,11 @@ export const addProduct = createAsyncThunk(
   }
 );
 
-export const updateProduct = createAsyncThunk(
-  "product/updateProduct",
-  async (
-    { id, formData }: { id: number; formData: FormData },
-    { rejectWithValue }
-  ) => {
+export const updateCartItem = createAsyncThunk(
+  "cart/updateCartItem",
+  async ({ id, data }: { id: number; data: any }, { rejectWithValue }) => {
     try {
-      const response = await instance.put(`/product/${id}`, formData, {
+      const response = await instance.put(`/cart/${id}`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       return response.data;

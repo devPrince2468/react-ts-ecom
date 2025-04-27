@@ -1,3 +1,4 @@
+import { Navigate, useRoutes } from "react-router-dom";
 import Login from "../pages/User/Login";
 import Register from "../pages/User/Register";
 import Dashboard from "../pages/Dashboard";
@@ -6,9 +7,7 @@ import Users from "../pages/Admin/Users";
 import PublicLayout from "../layouts/PublicLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import ProtectedRoute from "./ProtectedRoute";
-import { useRoutes } from "react-router-dom";
-import Home from "../pages/Home/Index";
-import NotFound from "../pages/NotFound/Index";
+import NotFound from "../pages/NotFound/index";
 import Products from "../pages/Products";
 
 const AppRoutes = () => {
@@ -17,11 +16,18 @@ const AppRoutes = () => {
       path: "/",
       element: <PublicLayout />,
       children: [
-        { path: "", element: <Home /> },
+        { index: true, element: <Navigate to="/login" replace /> },
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
-        { path: "products", element: <Products /> },
       ],
+    },
+    {
+      path: "/products",
+      element: (
+        <ProtectedRoute>
+          <Products />
+        </ProtectedRoute>
+      ),
     },
     {
       path: "/dashboard",

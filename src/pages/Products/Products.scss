@@ -198,6 +198,8 @@
     img {
       border-radius: 5px;
       margin-bottom: 10px;
+      height: auto;
+      width: 20%;
     }
 
     textarea {
@@ -216,6 +218,35 @@
         cursor: pointer;
         transition: background-color 0.2s ease;
       }
+    }
+  }
+}
+
+.add-to-cart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+
+  .add-to-cart-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: #218838;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
   }
 }
