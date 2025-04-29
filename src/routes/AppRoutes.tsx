@@ -9,6 +9,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import NotFound from "../pages/NotFound/index";
 import Products from "../pages/Products";
+import Cart from "../pages/Cart";
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -26,6 +27,14 @@ const AppRoutes = () => {
       element: (
         <ProtectedRoute>
           <Products />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/cart",
+      element: (
+        <ProtectedRoute>
+          <Cart />
         </ProtectedRoute>
       ),
     },

@@ -33,9 +33,21 @@ export const updateCartItem = createAsyncThunk(
   "cart/updateCartItem",
   async ({ id, data }: { id: number; data: any }, { rejectWithValue }) => {
     try {
-      const response = await instance.put(`/cart/${id}`, data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await instance.put(`/cart/${id}`, data);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Something went wrong"
+      );
+    }
+  }
+);
+
+export const deleteCartItem = createAsyncThunk(
+  "cart/deleteCartItem",
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const response = await instance.delete(`/cart/${id}`);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
