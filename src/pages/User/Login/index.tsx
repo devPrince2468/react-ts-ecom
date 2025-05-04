@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import "./Login.scss";
 import { loginUser } from "../../../redux/Slices/users/userThunks";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,6 +16,13 @@ const Login: React.FC = () => {
   const { user, loading, error, success } = useSelector(
     (state: RootState) => state.users
   );
+
+  React.useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
+      navigate("/products");
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,14 +42,6 @@ const Login: React.FC = () => {
       }
     });
   };
-
-  // React.useEffect(() => {
-  //   if (user && user.id) {
-  //     console.log("User logged in successfully:", user);
-  //     setUserData({ email: "", password: "" });
-  //     navigate("/products");
-  //   }
-  // }, [user, navigate]);
 
   return (
     <div className="login-container">

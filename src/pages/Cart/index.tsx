@@ -91,44 +91,52 @@ const Cart: React.FC = () => {
         <p className="cart__empty-message">Your cart is empty.</p>
       ) : (
         <div className="cart__items">
-          {cart.map((product: Product, index) => (
-            <div key={index} className="cart__item">
-              <span className="cart__item-name">{product.productName}</span>
-              <span className="cart__item-price">${product.productPrice}</span>
-              <div className="cart__item-quantity-controls">
+          {cart && cart.length > 0 ? (
+            cart.map((product: Product, index) => (
+              <div key={index} className="cart__item">
+                <span className="cart__item-name">{product.productName}</span>
+                <span className="cart__item-price">
+                  ${product.productPrice}
+                </span>
+                <div className="cart__item-quantity-controls">
+                  <button
+                    className="cart__item-decrement"
+                    onClick={() =>
+                      handleQuantityChange(
+                        product.productId,
+                        product.quantity - 1
+                      )
+                    }
+                    disabled={product.quantity === 1}
+                  >
+                    -
+                  </button>
+                  <span className="cart__item-quantity">
+                    {product.quantity}
+                  </span>
+                  <button
+                    className="cart__item-increment"
+                    onClick={() =>
+                      handleQuantityChange(
+                        product.productId,
+                        product.quantity + 1
+                      )
+                    }
+                  >
+                    +
+                  </button>
+                </div>
                 <button
-                  className="cart__item-decrement"
-                  onClick={() =>
-                    handleQuantityChange(
-                      product.productId,
-                      product.quantity - 1
-                    )
-                  }
-                  disabled={product.quantity === 1}
+                  className="cart__item-remove"
+                  onClick={() => handleRemove(product.productId)}
                 >
-                  -
-                </button>
-                <span className="cart__item-quantity">{product.quantity}</span>
-                <button
-                  className="cart__item-increment"
-                  onClick={() =>
-                    handleQuantityChange(
-                      product.productId,
-                      product.quantity + 1
-                    )
-                  }
-                >
-                  +
+                  Remove
                 </button>
               </div>
-              <button
-                className="cart__item-remove"
-                onClick={() => handleRemove(product.productId)}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="cart__empty-message">Your cart is empty.</p>
+          )}
         </div>
       )}
       {cart?.length > 0 && (
@@ -140,9 +148,11 @@ const Cart: React.FC = () => {
         </div>
       )}
 
-      <div className="cart__checkout">
-        <button className="cart__checkout-button">Checkout</button>
-      </div>
+      {cart?.length > 0 && (
+        <div className="cart__checkout">
+          <button className="cart__checkout-button">Checkout</button>
+        </div>
+      )}
     </div>
   );
 };

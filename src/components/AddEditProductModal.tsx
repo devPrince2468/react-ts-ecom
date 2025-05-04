@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, store } from "../redux/store";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
   addProduct,
@@ -22,12 +22,14 @@ interface AddEditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   product?: Product | null;
+  onSuccess?: (isSuccessful: boolean) => boolean; // Update callback to accept Product or boolean
 }
 
 const AddEditProductModal = ({
   isOpen,
   onClose,
   product,
+  onSuccess, // Destructure the callback
 }: AddEditProductModalProps) => {
   const dispatch = useDispatch<typeof store.dispatch>();
   const { loading } = useSelector((state: RootState) => state.products);
@@ -133,6 +135,7 @@ const AddEditProductModal = ({
       if (product?.id) {
         await dispatch(updateProduct({ id: Number(product.id), formData }));
         toast.success("Product updated successfully");
+        onSuccess?.(true); // Notify parent on success
       } else {
         if (!newImage) {
           toast.error("Please upload an image");
@@ -141,8 +144,10 @@ const AddEditProductModal = ({
         const res = await dispatch(addProduct(formData));
         if (res.meta.requestStatus === "fulfilled") {
           toast.success("Product added successfully");
+          onSuccess?.(true); // Notify parent on success
         } else {
           toast.error("Failed to add product");
+          onSuccess?.(false); // Notify parent on failure
         }
       }
 
@@ -151,6 +156,7 @@ const AddEditProductModal = ({
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong");
+      onSuccess?.(false); // Notify parent on failure
     }
   };
 

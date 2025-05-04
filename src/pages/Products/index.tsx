@@ -137,6 +137,22 @@ const Products = () => {
     });
   };
 
+  const handleModalSuccess = (isSuccessful: boolean): boolean => {
+    // Fetch updated products data
+    if (!isSuccessful) return false;
+    setIsModalOpen(false);
+    dispatch(getProducts()).then((res) => {
+      if (res.meta.requestStatus === "fulfilled") {
+        console.log("Products updated successfully:", res.payload);
+        setProductsData(res.payload.data);
+        toast.success("Product updated successfully!");
+      } else {
+        console.error("Failed to fetch updated products:", res);
+      }
+    });
+    return true;
+  };
+
   return (
     <div className="home">
       <div className="header-container">
@@ -220,6 +236,7 @@ const Products = () => {
           setEditProduct(null);
         }}
         product={editProduct}
+        onSuccess={handleModalSuccess} // Pass the callback to the modal
       />
     </div>
   );
