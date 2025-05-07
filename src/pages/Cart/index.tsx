@@ -19,6 +19,8 @@ interface Product {
   image: string;
 }
 
+// Card Component
+
 const Cart: React.FC = () => {
   const [cart, setCart] = useState<Product[]>([]);
   const dispatch = useDispatch<typeof store.dispatch>();
