@@ -10,6 +10,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import NotFound from "../pages/NotFound/index";
 import Products from "../pages/Products";
 import Cart from "../pages/Cart";
+import Profile from "../pages/User/Profile/Index";
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -20,23 +21,31 @@ const AppRoutes = () => {
         { index: true, element: <Navigate to="/login" replace /> },
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
+        {
+          path: "products",
+          element: (
+            <ProtectedRoute>
+              <Products />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "cart",
+          element: (
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "profile",
+          element: (
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          ),
+        },
       ],
-    },
-    {
-      path: "/products",
-      element: (
-        <ProtectedRoute>
-          <Products />
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: "/cart",
-      element: (
-        <ProtectedRoute>
-          <Cart />
-        </ProtectedRoute>
-      ),
     },
     {
       path: "/dashboard",

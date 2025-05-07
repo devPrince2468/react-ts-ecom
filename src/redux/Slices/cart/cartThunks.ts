@@ -56,3 +56,17 @@ export const deleteCartItem = createAsyncThunk(
     }
   }
 );
+
+export const clearCart = createAsyncThunk(
+  "cart/clearCart",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.post("/cart/clearCart");
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Something went wrong"
+      );
+    }
+  }
+);

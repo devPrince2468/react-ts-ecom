@@ -32,3 +32,18 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+
+// get User Profile
+export const getUserProfile = createAsyncThunk(
+  "user/getUserProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/user/`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch user profile"
+      );
+    }
+  }
+);

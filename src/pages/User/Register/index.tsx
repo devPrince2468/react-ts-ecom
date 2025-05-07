@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
 import "./Register.scss";
 import { registerUser } from "../../../redux/Slices/users/userThunks";
-import { getProducts } from "../../../redux/Slices/products/productThunks";
 import { RootState } from "../../../redux/store";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -124,9 +122,12 @@ const Register = () => {
         {success && <p className="message">Registration successful!</p>}
         {error && <p className="error">Error: {error}</p>}
       </form>
-      <Link to="/login" className="link">
-        Back to Login
-      </Link>
+      <div className="form-footer">
+        <p>Already have an account?</p>
+        <Link to="/login" className="login-link">
+          Sign in here
+        </Link>
+      </div>
     </div>
   );
 };

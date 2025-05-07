@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import "./Login.scss";
 import { loginUser } from "../../../redux/Slices/users/userThunks";
@@ -81,9 +81,12 @@ const Login: React.FC = () => {
           {error && <p className="error-message">{error}</p>}
         </form>
 
-        <p className="login-footer">
-          Don't have an account? <a href="/register">Sign up</a>
-        </p>
+        <div className="form-footer">
+          <p>Already have an account?</p>
+          <Link to="/register" className="login-link">
+            Sign up
+          </Link>
+        </div>
       </div>
     </div>
   );

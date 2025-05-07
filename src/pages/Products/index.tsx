@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaShoppingCart } from "react-icons/fa";
 import "./Products.scss";
 import { RootState, store } from "../../redux/store";
 import { getProducts } from "../../redux/Slices/products/productThunks";
@@ -39,8 +39,6 @@ const Products = () => {
 
   const hasFetched = useRef(false);
 
-  console.log("cartItems Data:", cartItems);
-
   useEffect(() => {
     if (!hasFetched.current) {
       dispatch(getProducts()).then((res) => {
@@ -54,6 +52,7 @@ const Products = () => {
             },
             {}
           );
+          console.log("Initial quantities:", initialQuantities);
           setQuantities(initialQuantities);
         } else {
           console.error("Failed to fetch products:", res);
@@ -67,12 +66,15 @@ const Products = () => {
     dispatch(getCartItems()).then((res) => {
       if (res.meta.requestStatus === "fulfilled") {
         console.log("Cart items fetched successfully:", res.payload);
-        const transformedItems = res.payload.items.map((item: any) => ({
-          id: item.product.id,
-          name: item.product.title,
-          price: parseFloat(item.product.price),
-          quantity: item.quantity,
-        }));
+        const transformedItems =
+          res.payload.items &&
+          res.payload.items.length > 0 &&
+          res.payload.items.map((item: any) => ({
+            id: item.product.id,
+            name: item.product.title,
+            price: parseFloat(item.product.price),
+            quantity: item.quantity,
+          }));
         setCartData(transformedItems);
       } else {
         console.error("Failed to fetch cart items:", res);
@@ -80,8 +82,8 @@ const Products = () => {
     });
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div className="loading-container">Loading...</div>;
+  if (error) return <div className="error-container">Error: {error}</div>;
 
   const totalPages = Math.ceil(productsData?.length / itemsPerPage);
   const paginatedProducts = productsData?.slice(
@@ -154,58 +156,81 @@ const Products = () => {
   };
 
   return (
-    <div className="home">
-      <div className="header-container">
-        <h1>Welcome to Products Page</h1>
-        <button
-          onClick={() => {
-            setEditProduct(null);
-            setIsModalOpen(true);
-          }}
-          className="add-product-btn"
-        >
-          Add Product
-        </button>
-        <button
-          onClick={() => {
-            navigate("/cart");
-          }}
-          className="add-product-btn"
-        >
-          Cart
-        </button>
+    <div className="products-page">
+      <div className="products-header">
+        <h1>Products Collection</h1>
+        <div className="header-actions">
+          <button
+            onClick={() => {
+              setEditProduct(null);
+              setIsModalOpen(true);
+            }}
+            className="btn btn-add"
+          >
+            Add Product
+          </button>
+          <button
+            onClick={() => {
+              navigate("/cart");
+            }}
+            className="btn btn-cart"
+          >
+            <FaShoppingCart />
+            <span>Cart</span>
+          </button>
+          <button
+            onClick={() => {
+              navigate("/profile");
+            }}
+            className="btn btn-cart"
+          >
+            <span>Profile</span>
+          </button>
+        </div>
       </div>
-      <div className="card-container">
+
+      <div className="products-grid">
         {paginatedProducts &&
           paginatedProducts.map((product: any) => (
-            <div key={product.id} className="card">
-              <img src={product.image} alt={product.title} />
-              <h2>{product.title}</h2>
-              <p>{product.description}</p>
-              <p>${product.price}</p>
-              <div className="quantity-controls">
-                <button
-                  onClick={() => handleDecrement(product.id)}
-                  className="quantity-btn"
-                >
-                  -
-                </button>
-                <span>{quantities[product.id]}</span>
-                <button
-                  onClick={() => handleIncrement(product.id)}
-                  className="quantity-btn"
-                >
-                  +
-                </button>
-              </div>
-              <div className="buttons-container">
+            <div key={product.id} className="product-card">
+              <div className="product-image">
+                <img
+                  src={product.image || "/placeholder.svg"}
+                  alt={product.title}
+                />
                 <button
                   onClick={() => handleEditProduct(product)}
-                  className="edit-btn"
+                  className="edit-button"
+                  aria-label="Edit product"
                 >
                   <FaEdit />
                 </button>
-                <div className="add-to-cart-container">
+              </div>
+              <div className="product-content">
+                <h2 className="product-title">{product.title}</h2>
+                <p className="product-description">{product.description}</p>
+                <div className="product-price">{product.price}</div>
+
+                <div className="product-actions">
+                  <div className="quantity-controls">
+                    <button
+                      onClick={() => handleDecrement(product.id)}
+                      className="quantity-btn"
+                      aria-label="Decrease quantity"
+                    >
+                      -
+                    </button>
+                    <span className="quantity-value">
+                      {quantities[product.id]}
+                    </span>
+                    <button
+                      onClick={() => handleIncrement(product.id)}
+                      className="quantity-btn"
+                      aria-label="Increase quantity"
+                    >
+                      +
+                    </button>
+                  </div>
                   <button
                     onClick={() => handleAddToCart(product)}
                     className="add-to-cart-btn"
@@ -218,17 +243,20 @@ const Products = () => {
           ))}
       </div>
 
-      <div className="pagination">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            className={currentPage === index + 1 ? "active" : ""}
-            onClick={() => handlePageChange(index + 1)}
-          >
-            {index + 1}
-          </button>
-        ))}
-      </div>
+      {totalPages > 1 && (
+        <div className="pagination">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              className={currentPage === index + 1 ? "active" : ""}
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      )}
+
       <AddEditProductModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -236,7 +264,7 @@ const Products = () => {
           setEditProduct(null);
         }}
         product={editProduct}
-        onSuccess={handleModalSuccess} // Pass the callback to the modal
+        onSuccess={handleModalSuccess}
       />
     </div>
   );

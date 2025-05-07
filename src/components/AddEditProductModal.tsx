@@ -1,5 +1,7 @@
+"use client";
+
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, store } from "../redux/store";
+import type { RootState, store } from "../redux/store";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
@@ -7,6 +9,15 @@ import {
   updateProduct,
 } from "../redux/Slices/products/productThunks";
 import "../styles/AddEditProductModal.scss";
+import {
+  FaTimes as X,
+  FaUpload as Upload,
+  FaDollarSign as DollarSign,
+  FaTag as Tag,
+  FaBox as Box,
+  FaFileAlt as FileText,
+  FaFont as Type,
+} from "react-icons/fa";
 
 interface Product {
   id?: string;
@@ -22,14 +33,14 @@ interface AddEditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   product?: Product | null;
-  onSuccess?: (isSuccessful: boolean) => boolean; // Update callback to accept Product or boolean
+  onSuccess?: (isSuccessful: boolean) => boolean;
 }
 
 const AddEditProductModal = ({
   isOpen,
   onClose,
   product,
-  onSuccess, // Destructure the callback
+  onSuccess,
 }: AddEditProductModalProps) => {
   const dispatch = useDispatch<typeof store.dispatch>();
   const { loading } = useSelector((state: RootState) => state.products);
@@ -44,6 +55,8 @@ const AddEditProductModal = ({
     newImage: null as File | null,
     previewImage: null as string | null,
   });
+
+  const [activeTab, setActiveTab] = useState("details");
 
   useEffect(() => {
     if (product) {
@@ -73,6 +86,7 @@ const AddEditProductModal = ({
       newImage: null,
       previewImage: null,
     });
+    setActiveTab("details");
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,7 +128,7 @@ const AddEditProductModal = ({
     } = form;
 
     if (!title || !description || !price || !quantity || !category) {
-      toast.error("Please fill all fields");
+      toast.error("Please fill all required fields");
       return;
     }
 
@@ -135,7 +149,7 @@ const AddEditProductModal = ({
       if (product?.id) {
         await dispatch(updateProduct({ id: Number(product.id), formData }));
         toast.success("Product updated successfully");
-        onSuccess?.(true); // Notify parent on success
+        onSuccess?.(true);
       } else {
         if (!newImage) {
           toast.error("Please upload an image");
@@ -144,10 +158,10 @@ const AddEditProductModal = ({
         const res = await dispatch(addProduct(formData));
         if (res.meta.requestStatus === "fulfilled") {
           toast.success("Product added successfully");
-          onSuccess?.(true); // Notify parent on success
+          onSuccess?.(true);
         } else {
           toast.error("Failed to add product");
-          onSuccess?.(false); // Notify parent on failure
+          onSuccess?.(false);
         }
       }
 
@@ -156,89 +170,271 @@ const AddEditProductModal = ({
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong");
-      onSuccess?.(false); // Notify parent on failure
+      onSuccess?.(false);
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <h2>{product ? "Edit Product" : "Add Product"}</h2>
-
-        <form onSubmit={handleSubmit}>
-          <label>Product Name</label>
-          <input
-            type="text"
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            placeholder="Product Name"
-            required
-          />
-
-          <label>Category</label>
-          <input
-            type="text"
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-            placeholder="Category"
-            required
-          />
-
-          <label>Image</label>
-          {form.previewImage && (
-            <img
-              src={form.previewImage}
-              alt="Preview"
-              className="image-preview"
-            />
-          )}
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-
-          <label>Description</label>
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            placeholder="Description"
-            rows={4}
-            required
-          />
-
-          <label>Price</label>
-          <input
-            type="number"
-            name="price"
-            value={form.price}
-            onChange={handleChange}
-            placeholder="Price"
-            step="0.01"
-            min="0"
-            required
-          />
-
-          <label>Quantity</label>
-          <input
-            type="number"
-            name="quantity"
-            value={form.quantity}
-            onChange={handleChange}
-            placeholder="Quantity"
-            min="1"
-            required
-          />
-
-          <button type="submit" disabled={loading}>
-            {loading ? "Saving..." : product ? "Update Product" : "Add Product"}
+    <div className="product-modal-overlay" onClick={onClose}>
+      <div
+        className="product-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="product-modal-header">
+          <h2>{product ? "Edit Product" : "Add New Product"}</h2>
+          <button
+            onClick={onClose}
+            className="product-modal-close"
+            aria-label="Close modal"
+          >
+            <X />
           </button>
-        </form>
+        </div>
 
-        <button onClick={onClose} className="close-btn background-red">
-          X
-        </button>
+        <div className="product-modal-tabs">
+          <button
+            className={`product-modal-tab ${
+              activeTab === "details" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("details")}
+          >
+            Details
+          </button>
+          <button
+            className={`product-modal-tab ${
+              activeTab === "media" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("media")}
+          >
+            Media
+          </button>
+          <button
+            className={`product-modal-tab ${
+              activeTab === "pricing" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("pricing")}
+          >
+            Pricing
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="product-modal-form">
+          {activeTab === "details" && (
+            <div className="product-modal-tab-content">
+              <div className="form-group">
+                <label htmlFor="title">
+                  <Type className="form-icon" />
+                  Product Name <span className="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={form.title}
+                  onChange={handleChange}
+                  placeholder="Enter product name"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="category">
+                  <Tag className="form-icon" />
+                  Category <span className="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="category"
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  placeholder="Enter product category"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="description">
+                  <FileText className="form-icon" />
+                  Description <span className="required">*</span>
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  placeholder="Enter product description"
+                  rows={4}
+                  required
+                />
+              </div>
+            </div>
+          )}
+
+          {activeTab === "media" && (
+            <div className="product-modal-tab-content">
+              <div className="form-group image-upload-container">
+                <label>
+                  <Upload className="form-icon" />
+                  Product Image <span className="required">*</span>
+                </label>
+
+                <div className="image-upload-area">
+                  {form.previewImage ? (
+                    <div className="image-preview-container">
+                      <img
+                        src={form.previewImage || "/placeholder.svg"}
+                        alt="Preview"
+                        className="image-preview"
+                      />
+                      <button
+                        type="button"
+                        className="remove-image"
+                        onClick={() =>
+                          setForm((prev) => ({
+                            ...prev,
+                            previewImage: null,
+                            newImage: null,
+                          }))
+                        }
+                      >
+                        <X />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="upload-placeholder">
+                      <Upload className="upload-icon" />
+                      <p>Drag & drop or click to upload</p>
+                      <span>Supports JPG, PNG, GIF up to 5MB</span>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    id="image-upload"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="file-input"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "pricing" && (
+            <div className="product-modal-tab-content">
+              <div className="form-group">
+                <label htmlFor="price">
+                  <DollarSign className="form-icon" />
+                  Price <span className="required">*</span>
+                </label>
+                <div className="price-input-container">
+                  <span className="currency-symbol">$</span>
+                  <input
+                    type="number"
+                    id="price"
+                    name="price"
+                    value={form.price}
+                    onChange={handleChange}
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="quantity">
+                  <Box className="form-icon" />
+                  Quantity <span className="required">*</span>
+                </label>
+                <div className="quantity-input-group">
+                  <button
+                    type="button"
+                    className="quantity-btn"
+                    onClick={() =>
+                      setForm((prev) => ({
+                        ...prev,
+                        quantity: Math.max(1, prev.quantity - 1),
+                      }))
+                    }
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    id="quantity"
+                    name="quantity"
+                    value={form.quantity}
+                    onChange={handleChange}
+                    min="1"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="quantity-btn"
+                    onClick={() =>
+                      setForm((prev) => ({
+                        ...prev,
+                        quantity: prev.quantity + 1,
+                      }))
+                    }
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="product-modal-actions">
+            {activeTab === "details" ? (
+              <button
+                type="button"
+                className="next-btn"
+                onClick={() => setActiveTab("media")}
+              >
+                Next: Media
+              </button>
+            ) : activeTab === "media" ? (
+              <div className="button-group">
+                <button
+                  type="button"
+                  className="back-btn"
+                  onClick={() => setActiveTab("details")}
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  className="next-btn"
+                  onClick={() => setActiveTab("pricing")}
+                >
+                  Next: Pricing
+                </button>
+              </div>
+            ) : (
+              <div className="button-group">
+                <button
+                  type="button"
+                  className="back-btn"
+                  onClick={() => setActiveTab("media")}
+                >
+                  Back
+                </button>
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading
+                    ? "Saving..."
+                    : product
+                    ? "Update Product"
+                    : "Add Product"}
+                </button>
+              </div>
+            )}
+          </div>
+        </form>
       </div>
     </div>
   );
