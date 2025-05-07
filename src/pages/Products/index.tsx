@@ -5,10 +5,7 @@ import "./Products.scss";
 import { RootState, store } from "../../redux/store";
 import { getProducts } from "../../redux/Slices/products/productThunks";
 import AddEditProductModal from "../../components/AddEditProductModal.tsx";
-import {
-  addCartItem,
-  getCartItems,
-} from "../../redux/Slices/cart/cartThunks.ts";
+import { addCartItem } from "../../redux/Slices/cart/cartThunks.ts";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -23,13 +20,9 @@ interface Product {
 
 const Products = () => {
   const [productsData, setProductsData] = useState<any[]>([]);
-  const [cartData, setCartData] = useState<any[]>([]);
   const dispatch = useDispatch<typeof store.dispatch>();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.products);
-  const cartItems = useSelector(
-    (state: RootState) => state.cart?.items?.items || []
-  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,26 +54,6 @@ const Products = () => {
       hasFetched.current = true;
     }
   }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(getCartItems()).then((res) => {
-      if (res.meta.requestStatus === "fulfilled") {
-        console.log("Cart items fetched successfully:", res.payload);
-        const transformedItems =
-          res.payload.items &&
-          res.payload.items.length > 0 &&
-          res.payload.items.map((item: any) => ({
-            id: item.product.id,
-            name: item.product.title,
-            price: parseFloat(item.product.price),
-            quantity: item.quantity,
-          }));
-        setCartData(transformedItems);
-      } else {
-        console.error("Failed to fetch cart items:", res);
-      }
-    });
-  }, []);
 
   if (loading) return <div className="loading-container">Loading...</div>;
   if (error) return <div className="error-container">Error: {error}</div>;

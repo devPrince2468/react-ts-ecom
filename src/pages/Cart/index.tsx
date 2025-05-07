@@ -22,9 +22,7 @@ interface Product {
 const Cart: React.FC = () => {
   const [cart, setCart] = useState<Product[]>([]);
   const dispatch = useDispatch<typeof store.dispatch>();
-  const { loading, error, items } = useSelector(
-    (state: RootState) => state.cart
-  );
+  const { loading, error } = useSelector((state: RootState) => state.cart);
 
   useEffect(() => {
     dispatch(getCartItems()).then((res) => {

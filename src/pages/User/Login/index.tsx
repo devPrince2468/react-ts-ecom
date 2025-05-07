@@ -13,9 +13,7 @@ const Login: React.FC = () => {
   const dispatch = useDispatch<typeof store.dispatch>();
   const navigate = useNavigate();
 
-  const { user, loading, error, success } = useSelector(
-    (state: RootState) => state.users
-  );
+  const { loading, error } = useSelector((state: RootState) => state.users);
 
   React.useEffect(() => {
     const token = Cookies.get("token");
