@@ -20,7 +20,13 @@ const ProtectedRoute = ({
   children: JSX.Element;
   roles?: string[];
 }) => {
-  const token = Cookies.get("token");
+  const cookieToken = Cookies.get("token");
+  const sessionToken = sessionStorage.getItem("token");
+  const token = cookieToken || sessionToken || "";
+
+  if (!token) {
+    console.error("No token found in cookies or session storage");
+  }
 
   // If the token exists, decode it
   const user = token ? decodeToken(token) : null;
