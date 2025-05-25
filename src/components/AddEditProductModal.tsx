@@ -17,6 +17,7 @@ import {
   FaBox as Box,
   FaFileAlt as FileText,
   FaFont as Type,
+  FaLock as Lock,
 } from "react-icons/fa";
 
 interface Product {
@@ -25,7 +26,9 @@ interface Product {
   image: string;
   description: string;
   price: number;
-  quantity: number;
+  stock: number;
+  reserved: number;
+  available?: number;
   category: string;
 }
 
@@ -49,14 +52,13 @@ const AddEditProductModal = ({
     title: "",
     description: "",
     price: "",
-    quantity: 1,
+    stock: 1,
+    reserved: 0,
     category: "",
     imageUrl: "",
     newImage: null as File | null,
     previewImage: null as string | null,
   });
-
-  const [activeTab, setActiveTab] = useState("details");
 
   useEffect(() => {
     if (product) {
@@ -64,7 +66,8 @@ const AddEditProductModal = ({
         title: product.title,
         description: product.description,
         price: product.price.toString(),
-        quantity: product.quantity,
+        stock: product.stock,
+        reserved: product.reserved,
         category: product.category,
         imageUrl: product.image,
         newImage: null,
@@ -80,13 +83,13 @@ const AddEditProductModal = ({
       title: "",
       description: "",
       price: "",
-      quantity: 1,
+      stock: 1,
+      reserved: 0,
       category: "",
       imageUrl: "",
       newImage: null,
       previewImage: null,
     });
-    setActiveTab("details");
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,7 +113,10 @@ const AddEditProductModal = ({
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: name === "quantity" ? parseInt(value, 10) || 1 : value,
+      [name]:
+        name === "stock" || name === "reserved"
+          ? parseInt(value, 10) || 0
+          : value,
     }));
   };
 
@@ -121,13 +127,14 @@ const AddEditProductModal = ({
       title,
       description,
       price,
-      quantity,
+      stock,
+      reserved,
       category,
       newImage,
       imageUrl,
     } = form;
 
-    if (!title || !description || !price || !quantity || !category) {
+    if (!title || !description || !price || stock === undefined || !category) {
       toast.error("Please fill all required fields");
       return;
     }
@@ -136,7 +143,8 @@ const AddEditProductModal = ({
     formData.append("title", title);
     formData.append("description", description);
     formData.append("price", price);
-    formData.append("quantity", quantity.toString());
+    formData.append("stock", stock.toString());
+    formData.append("reserved", reserved.toString());
     formData.append("category", category);
 
     if (newImage) {
@@ -193,246 +201,232 @@ const AddEditProductModal = ({
           </button>
         </div>
 
-        <div className="product-modal-tabs">
-          <button
-            className={`product-modal-tab ${
-              activeTab === "details" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("details")}
-          >
-            Details
-          </button>
-          <button
-            className={`product-modal-tab ${
-              activeTab === "media" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("media")}
-          >
-            Media
-          </button>
-          <button
-            className={`product-modal-tab ${
-              activeTab === "pricing" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("pricing")}
-          >
-            Pricing
-          </button>
-        </div>
-
         <form onSubmit={handleSubmit} className="product-modal-form">
-          {activeTab === "details" && (
-            <div className="product-modal-tab-content">
-              <div className="form-group">
-                <label htmlFor="title">
-                  <Type className="form-icon" />
-                  Product Name <span className="required">*</span>
-                </label>
+          {/* Details Section */}
+          <div className="product-modal-section">
+            <h3>Details</h3>
+            <div className="form-group">
+              <label htmlFor="title">
+                <Type className="form-icon" />
+                Product Name <span className="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                placeholder="Enter product name"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="category">
+                <Tag className="form-icon" />
+                Category <span className="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="category"
+                name="category"
+                value={form.category}
+                onChange={handleChange}
+                placeholder="Enter product category"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="description">
+                <FileText className="form-icon" />
+                Description <span className="required">*</span>
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                placeholder="Enter product description"
+                rows={4}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Media Section */}
+          <div className="product-modal-section">
+            <h3>Media</h3>
+            <div className="form-group image-upload-container">
+              <label>
+                <Upload className="form-icon" />
+                Product Image <span className="required">*</span>
+              </label>
+              <div className="image-upload-area">
+                {form.previewImage ? (
+                  <div className="image-preview-container">
+                    <img
+                      src={form.previewImage || "/placeholder.svg"}
+                      alt="Preview"
+                      className="image-preview"
+                    />
+                    <button
+                      type="button"
+                      className="remove-image"
+                      onClick={() =>
+                        setForm((prev) => ({
+                          ...prev,
+                          previewImage: null,
+                          newImage: null,
+                        }))
+                      }
+                    >
+                      <X />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="upload-placeholder">
+                    <Upload className="upload-icon" />
+                    <p>Drag & drop or click to upload</p>
+                    <span>Supports JPG, PNG, GIF up to 5MB</span>
+                  </div>
+                )}
                 <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={form.title}
-                  onChange={handleChange}
-                  placeholder="Enter product name"
-                  required
+                  type="file"
+                  id="image-upload"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="file-input"
                 />
               </div>
+            </div>
+          </div>
 
-              <div className="form-group">
-                <label htmlFor="category">
-                  <Tag className="form-icon" />
-                  Category <span className="required">*</span>
-                </label>
+          {/* Pricing & Inventory Section */}
+          <div className="product-modal-section">
+            <h3>Pricing & Inventory</h3>
+            <div className="form-group">
+              <label htmlFor="price">
+                <DollarSign className="form-icon" />
+                Price <span className="required">*</span>
+              </label>
+              <div className="price-input-container">
+                <span className="currency-symbol">$</span>
                 <input
-                  type="text"
-                  id="category"
-                  name="category"
-                  value={form.category}
+                  type="number"
+                  id="price"
+                  name="price"
+                  value={form.price}
                   onChange={handleChange}
-                  placeholder="Enter product category"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="description">
-                  <FileText className="form-icon" />
-                  Description <span className="required">*</span>
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  placeholder="Enter product description"
-                  rows={4}
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
                   required
                 />
               </div>
             </div>
-          )}
 
-          {activeTab === "media" && (
-            <div className="product-modal-tab-content">
-              <div className="form-group image-upload-container">
-                <label>
-                  <Upload className="form-icon" />
-                  Product Image <span className="required">*</span>
-                </label>
-
-                <div className="image-upload-area">
-                  {form.previewImage ? (
-                    <div className="image-preview-container">
-                      <img
-                        src={form.previewImage || "/placeholder.svg"}
-                        alt="Preview"
-                        className="image-preview"
-                      />
-                      <button
-                        type="button"
-                        className="remove-image"
-                        onClick={() =>
-                          setForm((prev) => ({
-                            ...prev,
-                            previewImage: null,
-                            newImage: null,
-                          }))
-                        }
-                      >
-                        <X />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="upload-placeholder">
-                      <Upload className="upload-icon" />
-                      <p>Drag & drop or click to upload</p>
-                      <span>Supports JPG, PNG, GIF up to 5MB</span>
-                    </div>
-                  )}
-                  <input
-                    type="file"
-                    id="image-upload"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="file-input"
-                  />
-                </div>
+            <div className="form-group">
+              <label htmlFor="stock">
+                <Box className="form-icon" />
+                Stock Quantity <span className="required">*</span>
+              </label>
+              <div className="quantity-input-group">
+                <button
+                  type="button"
+                  className="quantity-btn"
+                  onClick={() =>
+                    setForm((prev) => ({
+                      ...prev,
+                      stock: Math.max(0, prev.stock - 1),
+                    }))
+                  }
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  id="stock"
+                  name="stock"
+                  value={form.stock}
+                  onChange={handleChange}
+                  min="0"
+                  required
+                />
+                <button
+                  type="button"
+                  className="quantity-btn"
+                  onClick={() =>
+                    setForm((prev) => ({
+                      ...prev,
+                      stock: prev.stock + 1,
+                    }))
+                  }
+                >
+                  +
+                </button>
               </div>
             </div>
-          )}
 
-          {activeTab === "pricing" && (
-            <div className="product-modal-tab-content">
-              <div className="form-group">
-                <label htmlFor="price">
-                  <DollarSign className="form-icon" />
-                  Price <span className="required">*</span>
-                </label>
-                <div className="price-input-container">
-                  <span className="currency-symbol">$</span>
-                  <input
-                    type="number"
-                    id="price"
-                    name="price"
-                    value={form.price}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    step="0.01"
-                    min="0"
-                    required
-                  />
-                </div>
+            <div className="form-group">
+              <label htmlFor="reserved">
+                <Lock className="form-icon" />
+                Reserved Quantity
+              </label>
+              <div className="quantity-input-group">
+                <button
+                  type="button"
+                  className="quantity-btn"
+                  onClick={() =>
+                    setForm((prev) => ({
+                      ...prev,
+                      reserved: Math.max(0, prev.reserved - 1),
+                    }))
+                  }
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  id="reserved"
+                  name="reserved"
+                  value={form.reserved}
+                  onChange={handleChange}
+                  min="0"
+                />
+                <button
+                  type="button"
+                  className="quantity-btn"
+                  onClick={() =>
+                    setForm((prev) => ({
+                      ...prev,
+                      reserved: prev.reserved + 1,
+                    }))
+                  }
+                >
+                  +
+                </button>
               </div>
-
-              <div className="form-group">
-                <label htmlFor="quantity">
-                  <Box className="form-icon" />
-                  Quantity <span className="required">*</span>
-                </label>
-                <div className="quantity-input-group">
-                  <button
-                    type="button"
-                    className="quantity-btn"
-                    onClick={() =>
-                      setForm((prev) => ({
-                        ...prev,
-                        quantity: Math.max(1, prev.quantity - 1),
-                      }))
-                    }
-                  >
-                    -
-                  </button>
-                  <input
-                    type="number"
-                    id="quantity"
-                    name="quantity"
-                    value={form.quantity}
-                    onChange={handleChange}
-                    min="1"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="quantity-btn"
-                    onClick={() =>
-                      setForm((prev) => ({
-                        ...prev,
-                        quantity: prev.quantity + 1,
-                      }))
-                    }
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
+              <p className="help-text">
+                Available: {Math.max(0, form.stock - form.reserved)}
+              </p>
             </div>
-          )}
+          </div>
 
+          {/* Modal Actions */}
           <div className="product-modal-actions">
-            {activeTab === "details" ? (
-              <button
-                type="button"
-                className="next-btn"
-                onClick={() => setActiveTab("media")}
-              >
-                Next: Media
+            <div className="button-group">
+              <button type="button" className="cancel-btn" onClick={onClose}>
+                Cancel
               </button>
-            ) : activeTab === "media" ? (
-              <div className="button-group">
-                <button
-                  type="button"
-                  className="back-btn"
-                  onClick={() => setActiveTab("details")}
-                >
-                  Back
-                </button>
-                <button
-                  type="button"
-                  className="next-btn"
-                  onClick={() => setActiveTab("pricing")}
-                >
-                  Next: Pricing
-                </button>
-              </div>
-            ) : (
-              <div className="button-group">
-                <button
-                  type="button"
-                  className="back-btn"
-                  onClick={() => setActiveTab("media")}
-                >
-                  Back
-                </button>
-                <button type="submit" className="submit-btn" disabled={loading}>
-                  {loading
-                    ? "Saving..."
-                    : product
-                    ? "Update Product"
-                    : "Add Product"}
-                </button>
-              </div>
-            )}
+              <button type="submit" className="submit-btn" disabled={loading}>
+                {loading
+                  ? "Saving..."
+                  : product
+                  ? "Update Product"
+                  : "Add Product"}
+              </button>
+            </div>
           </div>
         </form>
       </div>

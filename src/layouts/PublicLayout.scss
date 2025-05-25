@@ -63,6 +63,42 @@
     }
   }
 
+  // Media query for smaller screens
+  @media (max-width: 768px) {
+    .header {
+      .container {
+        flex-direction: column; // Stack logo and nav
+        align-items: flex-start; // Align items to the start
+      }
+
+      .nav {
+        width: 100%; // Make nav take full width
+        margin-top: 1rem; // Add some space above the nav
+
+        .nav-list {
+          flex-direction: column; // Stack nav items
+          align-items: flex-start; // Align items to the start
+        }
+
+        .nav-item {
+          margin-left: 0; // Remove left margin
+          margin-bottom: 0.5rem; // Add some space below each nav item
+          width: 100%; // Make nav items take full width
+
+          .nav-link {
+            display: block; // Make links take full width for easier tapping
+            padding: 0.75rem 1rem; // Adjust padding for a better touch target
+            border-bottom: 1px solid #eee; // Optional: add a separator
+
+            &.active::after {
+              display: none; // Hide the bottom border for active link to avoid double borders
+            }
+          }
+        }
+      }
+    }
+  }
+
   .main {
     flex: 1;
     padding: 2rem 0;
@@ -76,9 +112,10 @@
   }
 }
 
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
+// The .container class below is a duplicate and should be removed.
+// .container {
+//   width: 100%;
+//   max-width: 1200px;
+//   margin: 0 auto;
+//   padding: 0 1rem;
+// }

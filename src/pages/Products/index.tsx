@@ -16,17 +16,21 @@ interface Product {
   price: number;
   image: string;
   quantity?: number;
+  stock: number;
+  reserved: number;
+  available: number;
+  category: string;
 }
 
 const Products = () => {
-  const [productsData, setProductsData] = useState<any[]>([]);
+  const [productsData, setProductsData] = useState<Product[]>([]);
   const dispatch = useDispatch<typeof store.dispatch>();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state: RootState) => state.products);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [editProduct, setEditProduct] = useState<any>(null);
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const itemsPerPage = 6;
 
@@ -39,8 +43,8 @@ const Products = () => {
           console.log("Products fetched successfully:", res.payload);
           setProductsData(res.payload.data);
           const initialQuantities = res.payload.data.reduce(
-            (acc: any, product: any) => {
-              acc[product.id] = product.quantity || 1;
+            (acc: { [key: string]: number }, product: Product) => {
+              acc[product.id] = product.available > 0 ? 1 : 0;
               return acc;
             },
             {}
@@ -69,27 +73,49 @@ const Products = () => {
   };
 
   const handleIncrement = (productId: string) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [productId]: prev[productId] + 1,
-    }));
+    const product = productsData.find((p) => p.id === productId);
+    if (!product) return;
+
+    setQuantities((prev) => {
+      const currentQuantity = prev[productId] || 0;
+      if (currentQuantity >= product.available) {
+        toast.warn(`Only ${product.available} items available in stock!`);
+        return prev;
+      }
+      return {
+        ...prev,
+        [productId]: currentQuantity + 1,
+      };
+    });
   };
 
   const handleDecrement = (productId: string) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [productId]: prev[productId] > 1 ? prev[productId] - 1 : 1,
-    }));
+    setQuantities((prev) => {
+      const currentQuantity = prev[productId] || 1;
+      if (currentQuantity <= 1) {
+        toast.info("Quantity cannot be less than 1.");
+        return prev;
+      }
+      return {
+        ...prev,
+        [productId]: currentQuantity - 1,
+      };
+    });
   };
 
-  const handleEditProduct = (product: any) => {
+  const handleEditProduct = (product: Product) => {
     setEditProduct(product);
     setIsModalOpen(true);
   };
 
   const handleAddToCart = (product: Product) => {
-    if (!quantities[product.id]) {
-      console.error("Invalid quantity for product:", product);
+    if (!quantities[product.id] || quantities[product.id] === 0) {
+      toast.error("Please select a valid quantity.");
+      return;
+    }
+
+    if (quantities[product.id] > product.available) {
+      toast.error(`Only ${product.available} items available in stock!`);
       return;
     }
 
@@ -113,16 +139,29 @@ const Products = () => {
   };
 
   const handleModalSuccess = (isSuccessful: boolean): boolean => {
-    // Fetch updated products data
     if (!isSuccessful) return false;
     setIsModalOpen(false);
+    setEditProduct(null);
     dispatch(getProducts()).then((res) => {
       if (res.meta.requestStatus === "fulfilled") {
         console.log("Products updated successfully:", res.payload);
-        setProductsData(res.payload.data);
-        toast.success("Product updated successfully!");
+        const newProductsData = res.payload.data;
+        setProductsData(newProductsData);
+
+        const initialQuantities = newProductsData.reduce(
+          (acc: { [key: string]: number }, product: Product) => {
+            acc[product.id] = product.available > 0 ? 1 : 0;
+            return acc;
+          },
+          {}
+        );
+        setQuantities(initialQuantities);
+        console.log("Quantities re-initialized:", initialQuantities);
+
+        toast.success("Product list updated successfully!");
       } else {
         console.error("Failed to fetch updated products:", res);
+        toast.error("Failed to update product list.");
       }
     });
     return true;
@@ -162,9 +201,9 @@ const Products = () => {
         </div>
       </div>
 
-      <div className="products-grid">
-        {paginatedProducts &&
-          paginatedProducts.map((product: any) => (
+      {paginatedProducts && paginatedProducts.length > 0 ? (
+        <div className="products-grid">
+          {paginatedProducts.map((product: Product) => (
             <div key={product.id} className="product-card">
               <div className="product-image">
                 <img
@@ -183,6 +222,11 @@ const Products = () => {
                 <h2 className="product-title">{product.title}</h2>
                 <p className="product-description">{product.description}</p>
                 <div className="product-price">{product.price}</div>
+                <div className="product-availability">
+                  {product.available > 0
+                    ? `Available: ${product.available}`
+                    : "Out of stock"}
+                </div>
 
                 <div className="product-actions">
                   <div className="quantity-controls">
@@ -190,16 +234,18 @@ const Products = () => {
                       onClick={() => handleDecrement(product.id)}
                       className="quantity-btn"
                       aria-label="Decrease quantity"
+                      disabled={product.available === 0}
                     >
                       -
                     </button>
                     <span className="quantity-value">
-                      {quantities[product.id]}
+                      {quantities[product.id] || 0}
                     </span>
                     <button
                       onClick={() => handleIncrement(product.id)}
                       className="quantity-btn"
                       aria-label="Increase quantity"
+                      disabled={product.available === 0}
                     >
                       +
                     </button>
@@ -207,6 +253,7 @@ const Products = () => {
                   <button
                     onClick={() => handleAddToCart(product)}
                     className="add-to-cart-btn"
+                    disabled={product.available === 0}
                   >
                     Add to Cart
                   </button>
@@ -214,7 +261,12 @@ const Products = () => {
               </div>
             </div>
           ))}
-      </div>
+        </div>
+      ) : (
+        <div className="no-products-found">
+          <p>No products found. Check back later or add new products!</p>
+        </div>
+      )}
 
       {totalPages > 1 && (
         <div className="pagination">

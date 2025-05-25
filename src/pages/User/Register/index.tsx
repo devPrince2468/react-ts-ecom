@@ -23,10 +23,13 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
+    role: "USER",
   });
   const [image, setImage] = useState<File | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
@@ -44,6 +47,7 @@ const Register = () => {
     form.append("email", formData.email);
     form.append("password", formData.password);
     if (image) form.append("file", image);
+    form.append("role", formData.role);
 
     dispatch(registerUser(form)).then((res) => {
       if (res.meta.requestStatus === "fulfilled") {
@@ -69,6 +73,7 @@ const Register = () => {
         name: "",
         email: "",
         password: "",
+        role: "USER",
       });
     }
   }, [user]);
@@ -106,6 +111,18 @@ const Register = () => {
           placeholder="Enter your password"
           required
         />
+
+        <label htmlFor="role">Role</label>
+        <select
+          id="role"
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+          required
+        >
+          <option value="USER">User</option>
+          <option value="ADMIN">Admin</option>
+        </select>
 
         <label htmlFor="profileImage">Profile Image</label>
         <input

@@ -166,7 +166,7 @@
     font-weight: 500;
     color: #333;
 
-    @media (max-width: 767px) {
+    @media (max-width: 767.98px) {
       &::before {
         content: "Order ID: ";
         font-weight: normal;
@@ -178,7 +178,7 @@
   &__order-date {
     color: #555;
 
-    @media (max-width: 767px) {
+    @media (max-width: 767.98px) {
       &::before {
         content: "Date: ";
         font-weight: normal;
@@ -196,7 +196,7 @@
     padding: 0.5rem 0.7rem !important;
     width: fit-content;
 
-    @media (max-width: 767px) {
+    @media (max-width: 767.98px) {
       &::before {
         content: "Status: ";
         font-weight: normal;
@@ -235,7 +235,7 @@
     font-weight: 600;
     color: #333;
 
-    @media (max-width: 767px) {
+    @media (max-width: 767.98px) {
       &::before {
         content: "Total: ";
         font-weight: normal;
@@ -259,7 +259,7 @@
       background-color: #e0e0e0;
     }
 
-    @media (max-width: 767px) {
+    @media (max-width: 767.98px) {
       width: 100%;
       margin-top: 0.5rem;
     }
@@ -415,7 +415,7 @@
     font-weight: 500;
     color: #555;
 
-    @media (max-width: 767px) {
+    @media (max-width: 767.98px) {
       &::before {
         content: "Price: ";
         font-weight: normal;
@@ -427,7 +427,7 @@
   &__item-quantity {
     color: #555;
 
-    @media (max-width: 767px) {
+    @media (max-width: 767.98px) {
       &::before {
         content: "Quantity: ";
         font-weight: normal;
@@ -440,7 +440,7 @@
     font-weight: 600;
     color: #333;
 
-    @media (max-width: 767px) {
+    @media (max-width: 767.98px) {
       &::before {
         content: "Subtotal: ";
         font-weight: normal;

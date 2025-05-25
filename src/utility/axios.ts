@@ -10,7 +10,10 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use((config) => {
-  const token = Cookies.get("token"); // Get token from cookies
+  let token = Cookies.get("token"); // Try to get token from cookies
+  if (!token) {
+    token = sessionStorage.getItem("token") || undefined; // Fallback to sessionStorage if not in cookies
+  }
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

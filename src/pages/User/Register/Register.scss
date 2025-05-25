@@ -16,22 +16,24 @@
   width: 100%;
 }
 
-.register-form input {
-  padding: 10px 14px;
-  font-size: 16px;
+.register-form input,
+.register-form select {
+  padding: 0.625rem 0.875rem;
+  font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 6px;
   transition: border-color 0.2s ease;
   width: -webkit-fill-available;
 }
 
-.register-form input:focus {
+.register-form input:focus,
+.register-form select:focus {
   border-color: #007bff;
   outline: none;
 }
 
 .register-form button {
-  padding: 12px;
+  padding: 0.75rem;
   background-color: #007bff;
   border: none;
   color: white;
@@ -46,8 +48,8 @@
 }
 
 .message {
-  margin-top: 10px;
-  font-size: 14px;
+  margin-top: 0.625rem;
+  font-size: 0.875rem;
   color: green;
 }
 
@@ -56,10 +58,10 @@
 }
 
 .get-products-btn {
-  margin-top: 20px;
+  margin-top: 1.25rem;
   background-color: #28a745;
   color: white;
-  padding: 10px 12px;
+  padding: 0.625rem 0.75rem;
   border-radius: 6px;
   border: none;
   cursor: pointer;
