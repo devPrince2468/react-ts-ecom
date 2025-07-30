@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createOrder, getOrders } from "./orderThunks";
+import { Order } from "../../../types/Order";
 
 interface OrderState {
-  items: any | null;
+  items: Order[] | null;
   loading: boolean;
   error: string | null;
   success: boolean;

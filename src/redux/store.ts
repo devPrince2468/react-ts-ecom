@@ -11,6 +11,7 @@ export const store = configureStore({
     cart: cartReducer,
     orders: orderReducer,
   },
+  devTools: true,
 });
 
 export type RootState = ReturnType<typeof store.getState>;

@@ -33,6 +33,38 @@ const AdminLayout = () => {
               </Link>
             </li>
             <li className="sidebar-nav-item">
+              <Link
+                to="/admin/products"
+                className={`sidebar-nav-link ${isActive("/admin/products")}`}
+              >
+                Products
+              </Link>
+            </li>
+            <li className="sidebar-nav-item">
+              <Link
+                to="/admin/orders"
+                className={`sidebar-nav-link ${isActive("/admin/orders")}`}
+              >
+                Orders
+              </Link>
+            </li>
+            <li className="sidebar-nav-item">
+              <Link
+                to="/admin/payments"
+                className={`sidebar-nav-link ${isActive("/admin/payments")}`}
+              >
+                Payments
+              </Link>
+            </li>
+            <li className="sidebar-nav-item">
+              <Link
+                to="/admin/reports"
+                className={`sidebar-nav-link ${isActive("/admin/reports")}`}
+              >
+                Reports
+              </Link>
+            </li>
+            <li className="sidebar-nav-item">
               <Link to="/dashboard" className="sidebar-nav-link">
                 Back to App
               </Link>

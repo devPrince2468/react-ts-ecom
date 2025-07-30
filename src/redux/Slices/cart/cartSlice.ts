@@ -6,9 +6,10 @@ import {
   getCartItems,
   updateCartItem,
 } from "./cartThunks";
+import Product from "../../../types/Product";
 
 interface CartState {
-  items: any | null;
+  items: Product[] | null;
   loading: boolean;
   error: string | null;
   success: boolean;
@@ -57,7 +58,7 @@ const cartSlice = createSlice({
       })
       .addCase(addCartItem.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload as string | null;
+        state.items = action.payload;
         state.success = true;
       })
       .addCase(addCartItem.rejected, (state, action) => {
@@ -74,7 +75,7 @@ const cartSlice = createSlice({
       })
       .addCase(updateCartItem.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload as string | null;
+        state.items = action.payload;
         state.success = true;
       })
       .addCase(updateCartItem.rejected, (state, action) => {
@@ -90,7 +91,7 @@ const cartSlice = createSlice({
       })
       .addCase(deleteCartItem.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload as string | null;
+        state.items = action.payload;
         state.success = true;
       })
       .addCase(deleteCartItem.rejected, (state, action) => {
@@ -107,7 +108,7 @@ const cartSlice = createSlice({
       })
       .addCase(clearCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload as string | null;
+        state.items = action.payload;
         state.success = true;
       })
       .addCase(clearCart.rejected, (state, action) => {

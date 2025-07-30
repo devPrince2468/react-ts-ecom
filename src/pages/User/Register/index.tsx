@@ -53,7 +53,6 @@ const Register = () => {
       if (res.meta.requestStatus === "fulfilled") {
         console.log("User registered successfully:", res.payload);
         navigate("/login");
-        // handleGetProducts();
       } else {
         console.error("Registration failed:", res);
         toast.error("Registration failed. Please try again.");

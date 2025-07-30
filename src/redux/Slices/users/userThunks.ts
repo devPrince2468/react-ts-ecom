@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import instance from "../../../utility/axios";
+import { AxiosError } from "axios";
 
 export const registerUser = createAsyncThunk(
   "user/registerUser",
@@ -9,10 +10,13 @@ export const registerUser = createAsyncThunk(
         headers: { "Content-Type": "multipart/form-data" },
       });
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Something went wrong"
-      );
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data?.message || "Something went wrong"
+        );
+      }
+      return rejectWithValue("Something went wrong");
     }
   }
 );
@@ -27,8 +31,11 @@ export const loginUser = createAsyncThunk(
     try {
       const response = await instance.post("/user/login", credentials);
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Login failed");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data?.message || "Login failed");
+      }
+      return rejectWithValue("Login failed");
     }
   }
 );
@@ -40,10 +47,31 @@ export const getUserProfile = createAsyncThunk(
     try {
       const response = await instance.get(`/user/`);
       return response.data;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch user profile"
-      );
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data?.message || "Failed to fetch user profile"
+        );
+      }
+      return rejectWithValue("Failed to fetch user profile");
+    }
+  }
+);
+
+// Get all users (for admin)
+export const getAllUsers = createAsyncThunk(
+  "user/getAllUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/user/`);
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(
+          error.response?.data?.message || "Failed to fetch users"
+        );
+      }
+      return rejectWithValue("Failed to fetch users");
     }
   }
 );

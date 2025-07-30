@@ -1,8 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getUserProfile, loginUser, registerUser } from "./userThunks";
+import {
+  getAllUsers,
+  getUserProfile,
+  loginUser,
+  registerUser,
+} from "./userThunks";
+import { AuthResponse, User } from "../../../types/User";
 
 interface UserState {
-  user: any | null;
+  user: User | null;
+  users: User[];
   loading: boolean;
   error: string | null;
   success: boolean;
@@ -10,6 +17,7 @@ interface UserState {
 
 const initialState: UserState = {
   user: null,
+  users: [],
   loading: false,
   error: null,
   success: false,
@@ -50,16 +58,16 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        const payload = action.payload as AuthResponse;
+        state.user = payload.user;
         state.success = true;
-        sessionStorage.setItem("token", action.payload.token);
+        sessionStorage.setItem("token", payload.token);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
         state.success = false;
       })
-
       // get user profile
       .addCase(getUserProfile.pending, (state) => {
         state.loading = true;
@@ -68,10 +76,26 @@ const userSlice = createSlice({
       })
       .addCase(getUserProfile.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload[0];
         state.success = true;
       })
       .addCase(getUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string | null;
+        state.success = false;
+      })
+      // Get all users
+      .addCase(getAllUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(getAllUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.users = action.payload;
+        state.success = true;
+      })
+      .addCase(getAllUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string | null;
         state.success = false;

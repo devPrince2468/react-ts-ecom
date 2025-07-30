@@ -4,6 +4,10 @@ import Register from "../pages/User/Register";
 import Dashboard from "../pages/Dashboard";
 import AdminPanel from "../pages/Admin/Panel";
 import Users from "../pages/Admin/Users";
+import AdminProducts from "../pages/Admin/Products";
+import AdminOrders from "../pages/Admin/Orders";
+import AdminPayments from "../pages/Admin/Payments";
+import AdminReports from "../pages/Admin/Reports";
 import PublicLayout from "../layouts/PublicLayout";
 import AdminLayout from "../layouts/AdminLayout";
 import ProtectedRoute from "./ProtectedRoute";
@@ -11,6 +15,7 @@ import NotFound from "../pages/NotFound/index";
 import Products from "../pages/Products";
 import Cart from "../pages/Cart";
 import Profile from "../pages/User/Profile/Index";
+import UserOrders from "../pages/User/Orders";
 
 const AppRoutes = () => {
   const routes = useRoutes([
@@ -45,6 +50,14 @@ const AppRoutes = () => {
             </ProtectedRoute>
           ),
         },
+        {
+          path: "orders",
+          element: (
+            <ProtectedRoute>
+              <UserOrders />
+            </ProtectedRoute>
+          ),
+        },
       ],
     },
     {
@@ -58,13 +71,17 @@ const AppRoutes = () => {
     {
       path: "/admin",
       element: (
-        <ProtectedRoute roles={["admin"]}>
+        <ProtectedRoute roles={["ADMIN"]}>
           <AdminLayout />
         </ProtectedRoute>
       ),
       children: [
         { index: true, element: <AdminPanel /> },
         { path: "users", element: <Users /> },
+        { path: "products", element: <AdminProducts /> },
+        { path: "orders", element: <AdminOrders /> },
+        { path: "payments", element: <AdminPayments /> },
+        { path: "reports", element: <AdminReports /> },
       ],
     },
     {

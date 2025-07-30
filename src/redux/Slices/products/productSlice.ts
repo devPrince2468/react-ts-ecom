@@ -1,15 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Product from "../../../types/Product";
 import { addProduct, getProducts, updateProduct } from "./productThunks";
 
 interface ProductState {
-  products: any | null;
+  products: Product[] | null;
   loading: boolean;
   error: string | null;
   success: boolean;
 }
 
 const initialState: ProductState = {
-  products: null,
+  products: [],
   loading: false,
   error: null,
   success: false,
@@ -51,7 +52,7 @@ const productSlice = createSlice({
       })
       .addCase(addProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload as string | null;
+        state.products = action.payload;
         state.success = true;
       })
       .addCase(addProduct.rejected, (state, action) => {
@@ -68,7 +69,7 @@ const productSlice = createSlice({
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload as string | null;
+        state.products = action.payload;
         state.success = true;
       })
       .addCase(updateProduct.rejected, (state, action) => {
