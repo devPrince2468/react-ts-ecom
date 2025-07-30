@@ -71,7 +71,7 @@ const Cart: React.FC = () => {
   };
 
   const handleRemove = (id: number) => {
-    dispatch(deleteCartItem(id)).then((res) => {
+    dispatch(deleteCartItem(id.toString())).then((res) => {
       if (res.meta.requestStatus === "fulfilled") {
         toast.success("Item removed from cart successfully.");
         setCart((prevCart) =>
@@ -95,7 +95,14 @@ const Cart: React.FC = () => {
   const handleCheckout = () => {
     // Implement checkout logic here
     console.log("Proceeding to checkout with items:", cart);
-    dispatch(createOrder(cart)).then((res) => {
+    const orderData = {
+      items: cart.map((item) => ({
+        productId: item.productId.toString(),
+        quantity: item.quantity,
+      })),
+      shippingAddress: "Default Address, Default City, Default Country, 12345",
+    };
+    dispatch(createOrder(orderData)).then((res) => {
       if (res.meta.requestStatus === "fulfilled") {
         toast.success("Order placed successfully.");
         // Clear the cart after successful order

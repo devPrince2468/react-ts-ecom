@@ -155,7 +155,7 @@ const AddEditProductModal = ({
 
     try {
       if (product?.id) {
-        await dispatch(updateProduct({ id: Number(product.id), formData }));
+        await dispatch(updateProduct({ id: product.id, formData }));
         toast.success("Product updated successfully");
         onSuccess?.(true);
       } else {

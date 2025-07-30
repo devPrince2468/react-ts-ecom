@@ -40,7 +40,7 @@ export const addCartItem = createAsyncThunk(
 export const updateCartItem = createAsyncThunk(
   "cart/updateCartItem",
   async (
-    { id, data }: { id: string; data: UpdateCartItemData },
+    { id, data }: { id: number; data: UpdateCartItemData },
     { rejectWithValue }
   ) => {
     try {
